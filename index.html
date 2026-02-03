@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HBPC Income Estimator</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+
+    :root {
+      --bg: #f2f8f8;
+      --panel: #ffffff;
+      --panel-2: #f6fbfb;
+      --accent: #1f8a94;
+      --accent-2: #2db4a1;
+      --text: #102a2f;
+      --muted: #5f7a82;
+      --danger: #d96565;
+      --shadow: rgba(16, 42, 47, 0.1);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1100px 700px at 5% -10%, rgba(45, 180, 161, 0.25) 0%, transparent 60%),
+        radial-gradient(900px 600px at 100% 0%, rgba(31, 138, 148, 0.18) 0%, transparent 55%),
+        linear-gradient(180deg, #eef6f6 0%, #f7fbfb 55%, #f2f8f8 100%);
+      min-height: 100vh;
+      padding: 32px 20px 56px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      gap: 24px;
+    }
+
+    header {
+      display: grid;
+      gap: 10px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-family: "Playfair Display", serif;
+      font-weight: 700;
+      font-size: clamp(2.2rem, 3vw, 3rem);
+      letter-spacing: 0.02em;
+    }
+
+    header p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 780px;
+      line-height: 1.5;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(280px, 1.1fr) minmax(280px, 0.9fr);
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--panel);
+      border-radius: 18px;
+      box-shadow: 0 18px 40px var(--shadow);
+      padding: 22px;
+      border: 1px solid rgba(31, 138, 148, 0.08);
+    }
+
+    .card h2 {
+      margin: 0 0 14px;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .section {
+      margin-bottom: 18px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .section:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    label {
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      background: var(--panel-2);
+      border: 1px solid rgba(31, 138, 148, 0.15);
+      border-radius: 10px;
+      color: var(--text);
+      padding: 10px 12px;
+      font-size: 0.98rem;
+      outline: none;
+      transition: border 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    input[type="number"] { appearance: textfield; }
+
+    input:focus {
+      border-color: rgba(31, 138, 148, 0.6);
+      box-shadow: 0 0 0 2px rgba(31, 138, 148, 0.2);
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 12px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(31, 138, 148, 0.12);
+      color: var(--accent);
+      font-size: 0.85rem;
+    }
+
+    .results {
+      display: grid;
+      gap: 16px;
+    }
+
+    .result-block {
+      background: rgba(255,255,255,0.04);
+      border-radius: 14px;
+      padding: 16px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .result-block h3 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+    }
+
+    .metric {
+      background: rgba(31, 138, 148, 0.06);
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    .metric strong {
+      font-size: 1.08rem;
+      font-weight: 600;
+    }
+
+    .highlight {
+      border: 1px solid rgba(31, 138, 148, 0.35);
+      background: rgba(31, 138, 148, 0.12);
+    }
+
+    .note {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .totals {
+      display: grid;
+      gap: 10px;
+    }
+
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(31, 138, 148, 0.08);
+      font-weight: 600;
+    }
+
+    .total-row.net {
+      background: rgba(45, 180, 161, 0.18);
+      border: 1px solid rgba(45, 180, 161, 0.4);
+    }
+
+    .foot {
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 980px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      body {
+        padding: 24px 14px 40px;
+      }
+
+      .card {
+        padding: 18px;
+      }
+
+      .row {
+        grid-template-columns: 1fr;
+      }
+
+      .result-grid {
+        grid-template-columns: 1fr;
+      }
+
+      header h1 {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <span class="badge">Standalone HBPC Financial Estimator</span>
+      <h1>HBPC Income Estimator</h1>
+      <p>
+        Estimate annual revenue, expenses, and net income for a Home-Based Primary Care (HBPC) program.
+        Defaults are editable so you can tune for your model.
+      </p>
+    </header>
+
+    <section class="grid">
+      <div class="card">
+        <h2>Inputs</h2>
+        <div class="section">
+          <div class="row">
+            <div class="field">
+              <label for="mdFte">Provider FTEs (MD/DO)</label>
+              <input id="mdFte" type="number" min="0" step="0.1" value="1" />
+            </div>
+            <div class="field">
+              <label for="npFte">Provider FTEs (PA/NP)</label>
+              <input id="npFte" type="number" min="0" step="0.1" value="2" />
+            </div>
+            <div class="field">
+              <label for="nonProvFte">Non-provider FTEs (total)</label>
+              <input id="nonProvFte" type="number" min="0" step="0.1" value="1" />
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Service Reach & Volume Assumptions</h2>
+          <div class="row">
+            <div class="field">
+              <label for="panelSize">Panel size per provider (patients)</label>
+              <input id="panelSize" type="number" min="0" step="1" value="250" />
+            </div>
+            <div class="field">
+              <label for="visitsPerDay">Visits per provider per day</label>
+              <input id="visitsPerDay" type="number" min="0" step="0.1" value="6" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label for="workdays">Workdays per year</label>
+              <input id="workdays" type="number" min="0" step="1" value="220" />
+            </div>
+            <div class="field">
+              <label for="newPatientRate">New patient rate (% of panel / year)</label>
+              <input id="newPatientRate" type="number" min="0" step="0.1" value="20" />
+            </div>
+          </div>
+          <p class="note">New patient visits default assumes 1 initial visit per new patient.</p>
+        </div>
+
+        <div class="section">
+          <h2>Revenue Assumptions</h2>
+          <div class="row">
+            <div class="field">
+              <label for="npRate">PA/NP reimbursement factor</label>
+              <input id="npRate" type="number" min="0" max="1" step="0.01" value="0.85" />
+            </div>
+            <div class="field">
+              <label for="nonEmPpp">Non E/M revenue per patient / year</label>
+              <input id="nonEmPpp" type="number" min="0" step="1" value="500" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="newPctL2">New visit mix L2 (HCPCS 99342) %</label>
+              <input id="newPctL2" type="number" min="0" max="100" step="1" value="15" />
+            </div>
+            <div class="field">
+              <label for="newPctL3">New visit mix L3 (HCPCS 99343) %</label>
+              <input id="newPctL3" type="number" min="0" max="100" step="1" value="35" />
+            </div>
+            <div class="field">
+              <label for="newPctL4">New visit mix L4 (HCPCS 99344) %</label>
+              <input id="newPctL4" type="number" min="0" max="100" step="1" value="35" />
+            </div>
+            <div class="field">
+              <label for="newPctL5">New visit mix L5 (HCPCS 99345) %</label>
+              <input id="newPctL5" type="number" min="0" max="100" step="1" value="15" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="estPctL2">Established mix L2 (HCPCS 99348) %</label>
+              <input id="estPctL2" type="number" min="0" max="100" step="1" value="15" />
+            </div>
+            <div class="field">
+              <label for="estPctL3">Established mix L3 (HCPCS 99349) %</label>
+              <input id="estPctL3" type="number" min="0" max="100" step="1" value="35" />
+            </div>
+            <div class="field">
+              <label for="estPctL4">Established mix L4 (HCPCS 99350) %</label>
+              <input id="estPctL4" type="number" min="0" max="100" step="1" value="35" />
+            </div>
+            <div class="field">
+              <label for="estPctL5">Established mix L5 (HCPCS 99350) %</label>
+              <input id="estPctL5" type="number" min="0" max="100" step="1" value="15" />
+            </div>
+          </div>
+          <p class="note">Visit mix is based on home visit HCPCS codes. Rates are stored in the model and can be updated in the script if needed.</p>
+        </div>
+
+        <div class="section">
+          <h2>Expense Assumptions</h2>
+          <div class="row">
+            <div class="field">
+              <label for="mdSalary">MD annual salary</label>
+              <input id="mdSalary" type="number" min="0" step="1000" value="240000" />
+            </div>
+            <div class="field">
+              <label for="npSalary">PA/NP annual salary</label>
+              <input id="npSalary" type="number" min="0" step="1000" value="131000" />
+            </div>
+            <div class="field">
+              <label for="nonProvSalary">Non-provider annual salary (avg)</label>
+              <input id="nonProvSalary" type="number" min="0" step="1000" value="65000" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label for="benefitsRate">Benefits & payroll load (%)</label>
+              <input id="benefitsRate" type="number" min="0" step="0.1" value="25" />
+            </div>
+            <div class="field">
+              <label for="fixedExpenses">Other fixed expenses / year</label>
+              <input id="fixedExpenses" type="number" min="0" step="1000" value="20000" />
+            </div>
+            <div class="field">
+              <label for="variableRate">Variable expenses (% of revenue)</label>
+              <input id="variableRate" type="number" min="0" step="0.1" value="5" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="card">
+        <h2>Results</h2>
+        <div class="results">
+          <div class="result-block">
+            <h3>Demand & Visits</h3>
+            <div class="result-grid">
+              <div class="metric">
+                <span>Potential patients</span>
+                <strong id="outPatients">0</strong>
+              </div>
+              <div class="metric">
+                <span>New patient visits</span>
+                <strong id="outNewVisits">0</strong>
+              </div>
+              <div class="metric">
+                <span>Established visits</span>
+                <strong id="outEstVisits">0</strong>
+              </div>
+              <div class="metric">
+                <span>Total visits</span>
+                <strong id="outTotalVisits">0</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="result-block">
+            <h3>Revenue (Annual)</h3>
+            <div class="result-grid">
+              <div class="metric">
+                <span>New visit revenue</span>
+                <strong id="outNewRevenue">$0</strong>
+              </div>
+              <div class="metric">
+                <span>Established visit revenue</span>
+                <strong id="outEstRevenue">$0</strong>
+              </div>
+              <div class="metric">
+                <span>Non E/M revenue</span>
+                <strong id="outNonEm">$0</strong>
+              </div>
+              <div class="metric highlight">
+                <span>Total revenue</span>
+                <strong id="outTotalRevenue">$0</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="result-block">
+            <h3>Expenses (Annual)</h3>
+            <div class="result-grid">
+              <div class="metric">
+                <span>Personnel expenses</span>
+                <strong id="outPersonnel">$0</strong>
+              </div>
+              <div class="metric">
+                <span>Other fixed expenses</span>
+                <strong id="outFixed">$0</strong>
+              </div>
+              <div class="metric">
+                <span>Variable expenses</span>
+                <strong id="outVariable">$0</strong>
+              </div>
+              <div class="metric highlight">
+                <span>Total expenses</span>
+                <strong id="outTotalExpenses">$0</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="totals">
+            <div class="total-row">
+              <span>Total annual revenue</span>
+              <span id="outTotalRevenue2">$0</span>
+            </div>
+            <div class="total-row">
+              <span>Total annual expenses</span>
+              <span id="outTotalExpenses2">$0</span>
+            </div>
+            <div class="total-row net">
+              <span>Net annual income</span>
+              <span id="outNetIncome">$0</span>
+            </div>
+          </div>
+
+          <p class="foot">
+            This model is directional, not a guarantee. Update assumptions to fit your payer mix,
+            geography, productivity model, and visit coding distribution.
+          </p>
+        </div>
+      </aside>
+    </section>
+  </div>
+
+  <script>
+    const fmtInt = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
+    const fmtMoney = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+
+    const fields = Array.from(document.querySelectorAll('input'));
+
+    const NEW_RATES = [76.29, 107.4, 138.51, 196.79];
+    const EST_RATES = [74.66, 124.1, 180.75, 180.75];
+
+    function val(id) {
+      const el = document.getElementById(id);
+      if (!el) return 0;
+      const num = parseFloat(el.value);
+      return Number.isFinite(num) ? num : 0;
+    }
+
+    function pct(id) {
+      return val(id) / 100;
+    }
+
+    function computeRevenue(visitCount, mix, rates, factor) {
+      const levelVisits = mix.map(p => visitCount * p);
+      const revenue = levelVisits.reduce((sum, v, i) => sum + v * rates[i] * factor, 0);
+      return revenue;
+    }
+
+    function compute() {
+      const mdFte = val('mdFte');
+      const npFte = val('npFte');
+      const nonProvFte = val('nonProvFte');
+      const providers = mdFte + npFte;
+
+      const panelSize = val('panelSize');
+      const visitsPerDay = val('visitsPerDay');
+      const workdays = val('workdays');
+      const newPatientRate = pct('newPatientRate');
+
+      const potentialPatients = providers * panelSize;
+      const totalVisits = providers * visitsPerDay * workdays;
+      const newVisits = Math.min(totalVisits, potentialPatients * newPatientRate);
+      const estVisits = Math.max(0, totalVisits - newVisits);
+
+      const mdShare = providers > 0 ? mdFte / providers : 0;
+      const npShare = providers > 0 ? npFte / providers : 0;
+
+      const newMix = [
+        pct('newPctL2'),
+        pct('newPctL3'),
+        pct('newPctL4'),
+        pct('newPctL5')
+      ];
+
+      const estMix = [
+        pct('estPctL2'),
+        pct('estPctL3'),
+        pct('estPctL4'),
+        pct('estPctL5')
+      ];
+
+      const newRates = NEW_RATES;
+      const estRates = EST_RATES;
+
+      const npRate = val('npRate');
+
+      const mdNewRevenue = computeRevenue(newVisits * mdShare, newMix, newRates, 1);
+      const npNewRevenue = computeRevenue(newVisits * npShare, newMix, newRates, npRate);
+      const mdEstRevenue = computeRevenue(estVisits * mdShare, estMix, estRates, 1);
+      const npEstRevenue = computeRevenue(estVisits * npShare, estMix, estRates, npRate);
+
+      const newRevenue = mdNewRevenue + npNewRevenue;
+      const estRevenue = mdEstRevenue + npEstRevenue;
+      const nonEmRevenue = potentialPatients * val('nonEmPpp');
+      const totalRevenue = newRevenue + estRevenue + nonEmRevenue;
+
+      const mdSalary = val('mdSalary');
+      const npSalary = val('npSalary');
+      const nonProvSalary = val('nonProvSalary');
+      const personnelBase = mdFte * mdSalary + npFte * npSalary + nonProvFte * nonProvSalary;
+      const personnelExpenses = personnelBase * (1 + pct('benefitsRate'));
+      const fixedExpenses = val('fixedExpenses');
+      const variableExpenses = totalRevenue * pct('variableRate');
+      const totalExpenses = personnelExpenses + fixedExpenses + variableExpenses;
+      const netIncome = totalRevenue - totalExpenses;
+
+      document.getElementById('outPatients').textContent = fmtInt.format(potentialPatients);
+      document.getElementById('outNewVisits').textContent = fmtInt.format(newVisits);
+      document.getElementById('outEstVisits').textContent = fmtInt.format(estVisits);
+      document.getElementById('outTotalVisits').textContent = fmtInt.format(totalVisits);
+
+      document.getElementById('outNewRevenue').textContent = fmtMoney.format(newRevenue);
+      document.getElementById('outEstRevenue').textContent = fmtMoney.format(estRevenue);
+      document.getElementById('outNonEm').textContent = fmtMoney.format(nonEmRevenue);
+      document.getElementById('outTotalRevenue').textContent = fmtMoney.format(totalRevenue);
+      document.getElementById('outTotalRevenue2').textContent = fmtMoney.format(totalRevenue);
+
+      document.getElementById('outPersonnel').textContent = fmtMoney.format(personnelExpenses);
+      document.getElementById('outFixed').textContent = fmtMoney.format(fixedExpenses);
+      document.getElementById('outVariable').textContent = fmtMoney.format(variableExpenses);
+      document.getElementById('outTotalExpenses').textContent = fmtMoney.format(totalExpenses);
+      document.getElementById('outTotalExpenses2').textContent = fmtMoney.format(totalExpenses);
+
+      document.getElementById('outNetIncome').textContent = fmtMoney.format(netIncome);
+    }
+
+    fields.forEach(field => field.addEventListener('input', compute));
+    compute();
+  </script>
+</body>
+</html>
