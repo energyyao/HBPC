@@ -302,11 +302,10 @@
               <input id="workdays" type="number" min="0" step="1" value="220" />
             </div>
             <div class="field">
-              <label for="newPatientRate">New patient rate (% of panel / year)</label>
-              <input id="newPatientRate" type="number" min="0" step="0.1" value="20" />
+              <label for="newPatientRate">New patient visit rate (% of all visits)</label>
+              <input id="newPatientRate" type="number" min="0" step="0.1" value="7" />
             </div>
           </div>
-          <p class="note">New patient visits default assumes 1 initial visit per new patient.</p>
         </div>
 
         <div class="section">
@@ -325,41 +324,42 @@
           <div class="row">
             <div class="field">
               <label for="newPctL2">New visit mix L2 (HCPCS 99342) %</label>
-              <input id="newPctL2" type="number" min="0" max="100" step="1" value="15" />
+              <input id="newPctL2" type="number" min="0" max="100" step="1" value="2" />
             </div>
             <div class="field">
               <label for="newPctL3">New visit mix L3 (HCPCS 99343) %</label>
-              <input id="newPctL3" type="number" min="0" max="100" step="1" value="35" />
+              <input id="newPctL3" type="number" min="0" max="100" step="1" value="14" />
             </div>
             <div class="field">
               <label for="newPctL4">New visit mix L4 (HCPCS 99344) %</label>
-              <input id="newPctL4" type="number" min="0" max="100" step="1" value="35" />
+              <input id="newPctL4" type="number" min="0" max="100" step="1" value="46" />
             </div>
             <div class="field">
               <label for="newPctL5">New visit mix L5 (HCPCS 99345) %</label>
-              <input id="newPctL5" type="number" min="0" max="100" step="1" value="15" />
+              <input id="newPctL5" type="number" min="0" max="100" step="1" value="38" />
             </div>
           </div>
 
           <div class="row">
             <div class="field">
-              <label for="estPctL2">Established mix L2 (HCPCS 99348) %</label>
-              <input id="estPctL2" type="number" min="0" max="100" step="1" value="15" />
+              <label for="estPctL2">Established mix L2 (HCPCS 99347) %</label>
+              <input id="estPctL2" type="number" min="0" max="100" step="1" value="4" />
             </div>
             <div class="field">
-              <label for="estPctL3">Established mix L3 (HCPCS 99349) %</label>
-              <input id="estPctL3" type="number" min="0" max="100" step="1" value="35" />
+              <label for="estPctL3">Established mix L3 (HCPCS 99348) %</label>
+              <input id="estPctL3" type="number" min="0" max="100" step="1" value="22" />
             </div>
             <div class="field">
-              <label for="estPctL4">Established mix L4 (HCPCS 99350) %</label>
-              <input id="estPctL4" type="number" min="0" max="100" step="1" value="35" />
+              <label for="estPctL4">Established mix L4 (HCPCS 99349) %</label>
+              <input id="estPctL4" type="number" min="0" max="100" step="1" value="54" />
             </div>
             <div class="field">
               <label for="estPctL5">Established mix L5 (HCPCS 99350) %</label>
-              <input id="estPctL5" type="number" min="0" max="100" step="1" value="15" />
+              <input id="estPctL5" type="number" min="0" max="100" step="1" value="20" />
             </div>
           </div>
           <p class="note">Visit mix is based on home visit HCPCS codes. Rates are stored in the model and can be updated in the script if needed.</p>
+          <p class="note" id="mixWarning" style="display:none; color: var(--danger);"></p>
         </div>
 
         <div class="section">
@@ -374,7 +374,7 @@
               <input id="npSalary" type="number" min="0" step="1000" value="131000" />
             </div>
             <div class="field">
-              <label for="nonProvSalary">Non-provider annual salary (avg)</label>
+              <label for="nonProvSalary">Non-provider annual salary</label>
               <input id="nonProvSalary" type="number" min="0" step="1000" value="65000" />
             </div>
           </div>
@@ -495,7 +495,7 @@
     const fields = Array.from(document.querySelectorAll('input'));
 
     const NEW_RATES = [76.29, 107.4, 138.51, 196.79];
-    const EST_RATES = [74.66, 124.1, 180.75, 180.75];
+    const EST_RATES = [44.21, 74.66, 124.1, 180.75];
 
     function val(id) {
       const el = document.getElementById(id);
@@ -527,7 +527,7 @@
 
       const potentialPatients = providers * panelSize;
       const totalVisits = providers * visitsPerDay * workdays;
-      const newVisits = Math.min(totalVisits, potentialPatients * newPatientRate);
+      const newVisits = totalVisits * newPatientRate;
       const estVisits = Math.max(0, totalVisits - newVisits);
 
       const mdShare = providers > 0 ? mdFte / providers : 0;
@@ -546,6 +546,24 @@
         pct('estPctL4'),
         pct('estPctL5')
       ];
+
+      const newMixTotal = newMix.reduce((sum, v) => sum + v, 0);
+      const estMixTotal = estMix.reduce((sum, v) => sum + v, 0);
+      const warn = document.getElementById('mixWarning');
+      const warnings = [];
+      if (Math.abs(newMixTotal - 1) > 0.001) {
+        warnings.push(`New visit mix totals ${(newMixTotal * 100).toFixed(1)}%. Please adjust to 100%.`);
+      }
+      if (Math.abs(estMixTotal - 1) > 0.001) {
+        warnings.push(`Established visit mix totals ${(estMixTotal * 100).toFixed(1)}%. Please adjust to 100%.`);
+      }
+      if (warnings.length) {
+        warn.style.display = 'block';
+        warn.textContent = warnings.join(' ');
+      } else {
+        warn.style.display = 'none';
+        warn.textContent = '';
+      }
 
       const newRates = NEW_RATES;
       const estRates = EST_RATES;
