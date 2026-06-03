@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>HBPC Income Estimator</title>
+  <title>House Call Compass™: Fee-for-Service Revenue Forecaster</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
 
@@ -42,7 +42,13 @@
 
     header {
       display: grid;
-      gap: 10px;
+      gap: 12px;
+    }
+
+    .logo {
+      width: min(260px, 72vw);
+      height: auto;
+      display: block;
     }
 
     header h1 {
@@ -132,17 +138,6 @@
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
       gap: 12px;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: rgba(31, 138, 148, 0.12);
-      color: var(--accent);
-      font-size: 0.85rem;
     }
 
     .results {
@@ -250,23 +245,26 @@
       header h1 {
         font-size: 2rem;
       }
+
+      .logo {
+        width: min(220px, 76vw);
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <span class="badge">Standalone HBPC Financial Estimator</span>
-      <h1>HBPC Income Estimator</h1>
+      <img class="logo" src="https://www.hccinstitute.org/wp-content/uploads/2024/06/HCCI_logo_RGB_150dpi.png" alt="HCCI logo placeholder" />
+      <h1>House Call Compass™: Fee-for-Service Revenue Forecaster</h1>
       <p>
-        Estimate annual revenue, expenses, and net income for a Home-Based Primary Care (HBPC) program.
-        Defaults are editable so you can tune for your model.
+        Estimate annual revenue, expenses, and net income for your Home-Based Primary Care program.
       </p>
     </header>
 
     <section class="grid">
       <div class="card">
-        <h2>Inputs</h2>
+        <h2>Staff Assumptions</h2>
         <div class="section">
           <div class="row">
             <div class="field">
@@ -396,7 +394,7 @@
       </div>
 
       <aside class="card">
-        <h2>Results</h2>
+        <h2>The House Call Compass™ Forecast</h2>
         <div class="results">
           <div class="result-block">
             <h3>Demand & Visits</h3>
@@ -421,7 +419,7 @@
           </div>
 
           <div class="result-block">
-            <h3>Revenue (Annual)</h3>
+            <h3>Annual Revenue</h3>
             <div class="result-grid">
               <div class="metric">
                 <span>New visit revenue</span>
@@ -443,7 +441,7 @@
           </div>
 
           <div class="result-block">
-            <h3>Expenses (Annual)</h3>
+            <h3>Annual Expenses</h3>
             <div class="result-grid">
               <div class="metric">
                 <span>Personnel expenses</span>
@@ -466,15 +464,15 @@
 
           <div class="totals">
             <div class="total-row">
-              <span>Total annual revenue</span>
+              <span>Total Annual Revenue</span>
               <span id="outTotalRevenue2">$0</span>
             </div>
             <div class="total-row">
-              <span>Total annual expenses</span>
+              <span>Total Annual Expenses</span>
               <span id="outTotalExpenses2">$0</span>
             </div>
             <div class="total-row net">
-              <span>Net annual income</span>
+              <span>Net Annual Income</span>
               <span id="outNetIncome">$0</span>
             </div>
           </div>
