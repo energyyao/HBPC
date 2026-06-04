@@ -142,6 +142,42 @@
       box-shadow: 0 0 0 2px rgba(31, 138, 148, 0.2);
     }
 
+    .input-wrap {
+      position: relative;
+      display: block;
+    }
+
+    .input-wrap input {
+      width: 100%;
+    }
+
+    .input-wrap .prefix,
+    .input-wrap .suffix {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 0.92rem;
+      font-weight: 600;
+      pointer-events: none;
+    }
+
+    .input-wrap .prefix {
+      left: 12px;
+    }
+
+    .input-wrap .suffix {
+      right: 12px;
+    }
+
+    .input-wrap.has-prefix input {
+      padding-left: 28px;
+    }
+
+    .input-wrap.has-suffix input {
+      padding-right: 34px;
+    }
+
     .row {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -310,7 +346,10 @@
             </div>
             <div class="field">
               <label for="newPatientRate">New patient visit rate (% of all visits)</label>
-              <input id="newPatientRate" type="number" min="0" step="0.1" value="7" />
+              <div class="input-wrap has-suffix">
+                <input id="newPatientRate" type="number" min="0" step="0.1" value="7" />
+                <span class="suffix">%</span>
+              </div>
             </div>
           </div>
         </div>
@@ -324,45 +363,72 @@
             </div>
             <div class="field">
               <label for="nonEmPpp">Non E/M revenue per patient / year</label>
-              <input id="nonEmPpp" type="number" min="0" step="1" value="500" />
+              <div class="input-wrap has-prefix">
+                <input id="nonEmPpp" type="number" min="0" step="1" value="500" />
+                <span class="prefix">$</span>
+              </div>
             </div>
           </div>
 
           <div class="row">
             <div class="field">
               <label for="newPctL2">New visit mix L2 (HCPCS 99342) %</label>
-              <input id="newPctL2" type="number" min="0" max="100" step="1" value="2" />
+              <div class="input-wrap has-suffix">
+                <input id="newPctL2" type="number" min="0" max="100" step="1" value="2" />
+                <span class="suffix">%</span>
+              </div>
             </div>
             <div class="field">
               <label for="newPctL3">New visit mix L3 (HCPCS 99343) %</label>
-              <input id="newPctL3" type="number" min="0" max="100" step="1" value="14" />
+              <div class="input-wrap has-suffix">
+                <input id="newPctL3" type="number" min="0" max="100" step="1" value="14" />
+                <span class="suffix">%</span>
+              </div>
             </div>
             <div class="field">
               <label for="newPctL4">New visit mix L4 (HCPCS 99344) %</label>
-              <input id="newPctL4" type="number" min="0" max="100" step="1" value="46" />
+              <div class="input-wrap has-suffix">
+                <input id="newPctL4" type="number" min="0" max="100" step="1" value="46" />
+                <span class="suffix">%</span>
+              </div>
             </div>
             <div class="field">
               <label for="newPctL5">New visit mix L5 (HCPCS 99345) %</label>
-              <input id="newPctL5" type="number" min="0" max="100" step="1" value="38" />
+              <div class="input-wrap has-suffix">
+                <input id="newPctL5" type="number" min="0" max="100" step="1" value="38" />
+                <span class="suffix">%</span>
+              </div>
             </div>
           </div>
 
           <div class="row">
             <div class="field">
               <label for="estPctL2">Established mix L2 (HCPCS 99347) %</label>
-              <input id="estPctL2" type="number" min="0" max="100" step="1" value="4" />
+              <div class="input-wrap has-suffix">
+                <input id="estPctL2" type="number" min="0" max="100" step="1" value="4" />
+                <span class="suffix">%</span>
+              </div>
             </div>
             <div class="field">
               <label for="estPctL3">Established mix L3 (HCPCS 99348) %</label>
-              <input id="estPctL3" type="number" min="0" max="100" step="1" value="22" />
+              <div class="input-wrap has-suffix">
+                <input id="estPctL3" type="number" min="0" max="100" step="1" value="22" />
+                <span class="suffix">%</span>
+              </div>
             </div>
             <div class="field">
               <label for="estPctL4">Established mix L4 (HCPCS 99349) %</label>
-              <input id="estPctL4" type="number" min="0" max="100" step="1" value="54" />
+              <div class="input-wrap has-suffix">
+                <input id="estPctL4" type="number" min="0" max="100" step="1" value="54" />
+                <span class="suffix">%</span>
+              </div>
             </div>
             <div class="field">
               <label for="estPctL5">Established mix L5 (HCPCS 99350) %</label>
-              <input id="estPctL5" type="number" min="0" max="100" step="1" value="20" />
+              <div class="input-wrap has-suffix">
+                <input id="estPctL5" type="number" min="0" max="100" step="1" value="20" />
+                <span class="suffix">%</span>
+              </div>
             </div>
           </div>
           <p class="note">Visit mix is based on home visit HCPCS codes. Rates are stored in the model and can be updated in the script if needed.</p>
@@ -374,29 +440,47 @@
           <div class="row">
             <div class="field">
               <label for="mdSalary">MD annual salary</label>
-              <input id="mdSalary" type="number" min="0" step="1000" value="240000" />
+              <div class="input-wrap has-prefix">
+                <input id="mdSalary" type="number" min="0" step="1000" value="240000" />
+                <span class="prefix">$</span>
+              </div>
             </div>
             <div class="field">
               <label for="npSalary">PA/NP annual salary</label>
-              <input id="npSalary" type="number" min="0" step="1000" value="131000" />
+              <div class="input-wrap has-prefix">
+                <input id="npSalary" type="number" min="0" step="1000" value="131000" />
+                <span class="prefix">$</span>
+              </div>
             </div>
             <div class="field">
               <label for="nonProvSalary">Non-provider annual salary</label>
-              <input id="nonProvSalary" type="number" min="0" step="1000" value="65000" />
+              <div class="input-wrap has-prefix">
+                <input id="nonProvSalary" type="number" min="0" step="1000" value="65000" />
+                <span class="prefix">$</span>
+              </div>
             </div>
           </div>
           <div class="row">
             <div class="field">
               <label for="benefitsRate">Benefits & payroll load (%)</label>
-              <input id="benefitsRate" type="number" min="0" step="0.1" value="25" />
+              <div class="input-wrap has-suffix">
+                <input id="benefitsRate" type="number" min="0" step="0.1" value="25" />
+                <span class="suffix">%</span>
+              </div>
             </div>
             <div class="field">
               <label for="fixedExpenses">Other fixed expenses / year</label>
-              <input id="fixedExpenses" type="number" min="0" step="1000" value="20000" />
+              <div class="input-wrap has-prefix">
+                <input id="fixedExpenses" type="number" min="0" step="1000" value="20000" />
+                <span class="prefix">$</span>
+              </div>
             </div>
             <div class="field">
               <label for="variableRate">Variable expenses (% of revenue)</label>
-              <input id="variableRate" type="number" min="0" step="0.1" value="5" />
+              <div class="input-wrap has-suffix">
+                <input id="variableRate" type="number" min="0" step="0.1" value="5" />
+                <span class="suffix">%</span>
+              </div>
             </div>
           </div>
         </div>
